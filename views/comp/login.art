@@ -1,0 +1,87 @@
+{{extend '../layout'}}
+
+{{block 'title'}} {{title}} {{/block}}
+
+{{block 'linkcss'}}
+<link rel="stylesheet" href="./lib/layui/css/layui.css">
+<link rel="stylesheet" href="./css/login.css">
+{{/block}}
+{{block 'body'}}
+<!-- login form -->
+<div class="main">
+    <div class="title">
+        记录生活，记录你
+    </div>
+    <div class="loginbox">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+                <input type="text" name="user_name" id="LAY-user-login-username" lay-verify="required" placeholder="用户名"
+                    class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+                <input type="password" name="password" id="LAY-user-login-password" lay-verify="required" placeholder="密码"
+                    class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit="" lay-filter="login">登 入</button>
+            </div>
+        </form>
+        <div class="layui-trans layui-form-item layadmin-user-login-other">
+            <label>社交账号登入</label>
+            <!-- <a href="javascript:;"><i class="layui-icon layui-icon-login-qq"></i></a>
+            <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i></a>
+            <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo"></i></a> -->
+            
+            <a href="/reg" class="reg_num">注册帐号</a>
+          </div>
+    </div>
+</div>
+{{/block}}
+
+{{block 'javascript'}}
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+        var $ = layui.$
+        form.on('submit(login)', function (data) {
+            var loginData = data.field;
+            axios.post('/api/user/login', {
+                    user_name: loginData.user_name,
+                    password: loginData.password
+                })
+                .then(function (response) {
+                    var loaginRes = response.data;
+                    if (loaginRes.code == 200) {
+                        layer.msg('登录成功！', {
+                            icon: 1,
+                            time: 1000
+                        }, function () {
+                            sessionStorage.setItem('userinfo',JSON.stringify(loaginRes.data))
+                            window.location.href = './addrecord';
+                        })
+                    } else if(loaginRes.code == 412){
+                        layer.msg('用户名或密码错误!', {
+                            icon: 2,
+                            time: 1000
+                        })
+                    }else{
+                        layer.msg('用户不存在！', {
+                            icon: 3,
+                            time: 1000
+                        })
+                    }
+                })
+                .catch(function (error) {
+                    layer.msg('服务器出错!', {
+                        icon: 3,
+                        time: 1000
+                    })
+                })
+            //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            return false;
+        });
+    })
+</script>
+{{/block}}

@@ -1,0 +1,150 @@
+{{extend '../layout'}}
+
+{{block 'title'}} {{title}} {{/block}}
+
+{{block 'linkcss'}}
+<link rel="stylesheet" href="./lib/layui/css/layui.css">
+<link rel="stylesheet" href="./css/show.css">
+{{/block}}
+{{block 'body'}}
+<!-- showRecordINfo form -->
+<ul class="layui-nav">
+    <li class="layui-nav-item">
+      <a href="">控制台<span class="layui-badge">9</span></a>
+    </li>
+    <li class="layui-nav-item">
+      <a href="">个人中心<span class="layui-badge-dot"></span></a>
+    </li>
+    <li class="layui-nav-item">
+      <a href=""><img src="//t.cn/RCzsdCq" class="layui-nav-img">我</a>
+      <dl class="layui-nav-child">
+        <dd><a href="javascript:;">修改信息</a></dd>
+        <dd><a href="javascript:;">安全管理</a></dd>
+        <dd><a href="javascript:;">退了</a></dd>
+      </dl>
+    </li>
+    <li class="layui-nav-item"><a href="addrecord">记录</a></li>
+    <li class="layui-nav-item  layui-this"><a href="/show">展示分析</a></li>
+    <li class="layui-nav-item"><a href="/login">登录</a></li>
+    <li class="layui-nav-item"><a href="/reg">注册</a></li>
+</ul>
+<div class="body">
+    <!-- 日期选择 -->
+    <div class="datebox"> 
+        <label  for="date">请选择日期：</label> 
+        <input type="text" class="layui-input" id="date">
+    </div>
+    <!-- 结果展示 -->
+    <div class="resultbox">
+            <h2 class="nodata">您本月暂无数据!</h2>
+    </div>
+</div>
+
+{{/block}}
+
+{{block 'javascript'}}
+<script src="./lib/echarts/echarts.common.min.js"></script>
+<script>
+var USERINFO = JSON.parse(sessionStorage.getItem('userinfo'));
+layui.use(['element','laydate'], function(){
+  var laydate = layui.laydate;
+  var $ = layui.$
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#date', //指定元素
+    type: 'month',
+    done: function(value, date, endDate){
+        $('.resultbox .upload').show();
+        var seleDate = value.split('-').join('');
+        console.log(seleDate);
+        if (!USERINFO) {
+            layer.msg('请重新登录', {
+                icon: 3,
+                time: 1500
+            }, function () {
+                window.location.href = './login'
+            })
+        } else {
+            var UID = USERINFO.id;
+            var MON = seleDate;
+            var URL = `/api/record/mon/${UID}/${MON}`;
+            console.log(URL);
+            axios.get(URL).then((res)=>{
+                var Rdata = res.data.data
+                if(Rdata.length == 0){
+                    $('.resultbox .nodata').show();
+                }else{//echarts数据渲染
+                    $('.resultbox .nodata').hide();
+                    draw(value,Rdata,$('.resultbox')[0])
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }
+        
+    }
+  });
+});
+function draw(mon,data,Dom){
+    var BEGINLIST = [],ENDLIST = [],TIEMLIST = [];
+    data.map(function (item) {
+        BEGINLIST.push(item.begin);
+        ENDLIST.push(item.end);
+        TIEMLIST.push(item.create_time);
+    });
+    console.log(BEGINLIST)
+    console.log(ENDLIST)
+    console.log(TIEMLIST)
+    var option = {
+        title:{
+            text:USERINFO.username+"的" ,
+            subtext:mon+'月体重记录表',
+            textStyle: {color:"#009688",align: 'center'},
+            left: 'center'
+        },
+        legend: {
+            data:['早晨时','临睡前'],
+            right :'2%'
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            name:'时间',
+            type: 'category',
+            boundaryGap: false,
+            data: TIEMLIST
+        },
+        yAxis: {
+            name:'公斤',
+            type: 'value',
+            min:"dataMin",
+            max:"dataMax",
+        },
+        series: [
+            {
+                name:'早晨时',
+                type:'line',
+                data:BEGINLIST
+            },
+            {
+                name:'临睡前',
+                type:'line',
+                data:ENDLIST
+            }
+        ]
+        
+    };
+    var myChart = echarts.init(Dom);
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+}
+
+</script>
+{{/block}}

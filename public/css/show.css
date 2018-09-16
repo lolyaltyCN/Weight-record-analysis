@@ -1,0 +1,17 @@
+.body{
+    padding:  5% 5% 0 5%;
+}
+.datebox{
+    width: 10%;
+}
+.datebox input {
+    margin-top: 10px;
+}
+.resultbox{
+    width: 90%;
+    margin-top: 2.5%;
+    height: 600px;
+}
+.resultbox h2{
+    display: none;
+}

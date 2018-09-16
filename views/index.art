@@ -1,0 +1,37 @@
+{{extend './layout'}}
+
+{{block 'title'}}
+    {{title}}
+{{/block}}
+
+{{block 'linkcss'}}
+<link rel="stylesheet" href="./lib/layui/css/layui.css">
+{{/block}}
+
+{{block 'body'}}
+<ul class="layui-nav">
+    <li class="layui-nav-item">
+      <a href="">控制台<span class="layui-badge">9</span></a>
+    </li>
+    <li class="layui-nav-item">
+      <a href="">个人中心<span class="layui-badge-dot"></span></a>
+    </li>
+    <li class="layui-nav-item">
+      <a href=""><img src="//t.cn/RCzsdCq" class="layui-nav-img">我</a>
+      <dl class="layui-nav-child">
+        <dd><a href="javascript:;">修改信息</a></dd>
+        <dd><a href="javascript:;">安全管理</a></dd>
+        <dd><a href="javascript:;">退了</a></dd>
+      </dl>
+    </li>
+    <li class="layui-nav-item layui-this"><a href="">记录</a></li>
+    <li class="layui-nav-item"><a href="/show">展示分析</a></li>
+    <li class="layui-nav-item"><a href="/login">登录</a></li>
+    <li class="layui-nav-item"><a href="/reg">注册</a></li>
+</ul>
+{{/block}}
+
+
+{{block 'javascript'}}
+
+{{/block}}

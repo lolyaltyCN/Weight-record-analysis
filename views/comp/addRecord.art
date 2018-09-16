@@ -1,0 +1,117 @@
+{{extend '../layout'}}
+
+{{block 'title'}} {{title}} {{/block}}
+
+{{block 'linkcss'}}
+<link rel="stylesheet" href="./lib/layui/css/layui.css">
+<link rel="stylesheet" href="./css/addRecord.css">
+{{/block}}
+{{block 'body'}}
+<!-- addRecord form -->
+<ul class="layui-nav">
+    <li class="layui-nav-item">
+        <a href="">控制台<span class="layui-badge">9</span></a>
+    </li>
+    <li class="layui-nav-item">
+        <a href="">个人中心<span class="layui-badge-dot"></span></a>
+    </li>
+    <li class="layui-nav-item">
+        <a href=""><img src="//t.cn/RCzsdCq" class="layui-nav-img">我</a>
+        <dl class="layui-nav-child">
+            <dd><a href="javascript:;">修改信息</a></dd>
+            <dd><a href="javascript:;">安全管理</a></dd>
+            <dd><a href="javascript:;">退了</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item layui-this"><a href="addrecord">记录</a></li>
+    <li class="layui-nav-item"><a href="/show">展示分析</a></li>
+    <li class="layui-nav-item"><a href="/login">登录</a></li>
+    <li class="layui-nav-item"><a href="/reg">注册</a></li>
+</ul>
+<div class="recordbox">
+    <form class="layui-form addrecord">
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">早晨时</label>
+                <div class="layui-input-inline">
+                    <input type="text"  name="begin"   {{if data.begin}} value="{{data.begin}}{{/if}}"
+                        placeholder="请输入体重" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">公斤/KG</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">临睡前</label>
+                <div class="layui-input-inline">
+                    <input type="text"  name="end"  {{if (data.end != null)}} value="{{data.end}}{{/if}}"
+                        placeholder="请输入体重" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">公斤/KG</div>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit="" lay-filter="post">提交</button>
+            </div>
+        </div>
+    </form>
+</div>
+{{/block}}
+
+{{block 'javascript'}}
+<script>
+    //注意：导航 依赖 element 模块，否则无法进行功能性操作
+    layui.use(['element', 'form'], function () {
+        var form = layui.form;
+        var $ = layui.$
+        form.on('submit(post)', function (data) {
+            var loginData = data.field;
+            var USERINFO = JSON.parse(sessionStorage.getItem('userinfo'));
+            loginData.begin  = loginData.begin.replace(/\s/g,"") != "" ? loginData.begin.replace(/\s/g,"") : null
+            loginData.end    = loginData.end.replace(/\s/g,"")   != "" ? loginData.end.replace(/\s/g,"") : null
+            if (!USERINFO) {
+                layer.msg('请重新登录', {
+                    icon: 3,
+                    time: 1500
+                }, function () {
+                    window.location.href = './login'
+                })
+            } else {
+                
+            if(loginData.begin == null && loginData.end == null){
+                layer.msg('至少提交一个数据', {
+                    icon: 3,
+                    time: 1500
+                })
+            }else{
+                
+                axios.post('/api/record/add', {
+                        begin: loginData.begin,
+                        end: loginData.end,
+                        uid: USERINFO.id
+                    })
+                    .then(function (response) {
+                        var loaginRes = response.data;
+                        if (loaginRes.code == 200) {
+                            layer.msg('添加成功！', {
+                                icon: 1,
+                                time: 1000
+                            })
+                        } else {
+                            layer.msg('添加失败!', {
+                                icon: 3,
+                                time: 1000
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        layer.msg('服务器出错!', {
+                            icon: 3,
+                            time: 1000
+                        })
+                    })
+                }
+            }
+            //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+            return false;
+        });
+    });
+</script>
+{{/block}}
