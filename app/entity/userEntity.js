@@ -4,16 +4,30 @@ module.exports = function (sequelize, DataTypes) {
     return sequelize.define('userinfo', {
         id: {
             type: DataTypes.BIGINT(11),
-            autoIncrement: true,
             primaryKey: true
         },
         user_name: DataTypes.STRING,
-        birthday: DataTypes.DATE,
+        birthday: {
+            type:DataTypes.DATE ,
+            get: function () {
+                let date = this.getDataValue('birthday');
+                // return date ? moment(date).format('YYYY-MM-DD'):"1967-01-01"
+                return  moment(date).format('YYYY-MM-DD')
+            },
+            set:function () {
+                this.setDataValue('birthday',this.birthday);
+            },
+            defaultValue: sequelize.Sequelize.NOW
+        },
         create_time: {
             type: DataTypes.DATE,
             get: function () {
                 let date = this.getDataValue('create_time');
                 return moment(date).format('YYYY-MM-DD HH:mm:ss')
+                
+            },
+            set:function () {
+                this.setDataValue('create_time',this.create_time);
             }
         },
         update_time: {
@@ -21,6 +35,9 @@ module.exports = function (sequelize, DataTypes) {
             get: function () {
                 let date = this.getDataValue('update_time');
                 return moment(date).format('YYYY-MM-DD HH:mm:ss')
+            },
+            set:function () {
+                this.setDataValue('update_time',this.update_time);
             }
         }
     }, {

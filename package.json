@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "art-template": "^4.12.2",
+    "bcrypt": "^3.0.0",
     "debug": "^2.6.3",
+    "jsonwebtoken": "^8.2.2",
     "koa": "^2.2.0",
     "koa-art-template": "^1.1.1",
     "koa-bodyparser": "^3.2.0",

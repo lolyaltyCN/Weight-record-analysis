@@ -1,6 +1,8 @@
 const userModel = require('../service/userService');
 const stsCode = require('../utils/statusCode');
-
+const Snowflake = require('../utils/snowflake');
+const crypt = require('../utils/decrypt');
+const jwt = require('jsonwebtoken');
 
 class UserController {
     /**
@@ -14,10 +16,10 @@ class UserController {
         if (userList) {
             const data = await userModel.findAll();
             ctx.response.status = 200;
-            ctx.body = data
+            ctx.body = stsCode.S_900(data)
         } else {
             ctx.response.status = 412;
-            ctx.body = '获取失败';
+            ctx.body = stsCode.S_903('获取失败');
         }
     }
 
@@ -30,9 +32,10 @@ class UserController {
     static async addUserInfo(ctx) {
         let data = ctx.request.body;
         if (data) {
-            let odata = await userModel.create(data);
+            let id = Snowflake.GetOneId();
+            let odata = await userModel.create(data,id);
             ctx.response.status = 200;
-            ctx.body = odata ? stsCode.SUCCESS_200('创建用户成功', 'odata') : stsCode.ERROR_404('添加失败！')
+            ctx.body = odata ? stsCode.S_900(odata) : stsCode.S_903('添加失败！')
         } else {
             ctx.response.status = 412;
             ctx.body = '获取失败';
@@ -46,47 +49,46 @@ class UserController {
      */
     static async UserLogin(ctx) {
         let data = ctx.request.body;
-        let user = await userModel.login(data.user_name);
+        let user = await userModel.UserExist(data.user_name);
         if (user) {
-            if (user.password == data.password) {
-                // ctx.response.status = 200;
-                ctx.body = stsCode.SUCCESS_200('登录成功', {
+            if (crypt.decrypt(data.password,user.password)) {
+                ctx.body = stsCode.S_900({
                     id: user.id,
                     username: user.user_name,
                 })
             } else {
-                // ctx.response.status = 412;
-                ctx.body = stsCode.ERROR_412('用户名或密码错误');
+                ctx.body = stsCode.S_903('用户名或密码错误');
             }
 
         } else {
-            // ctx.response.status = 401;
-            ctx.body = stsCode.ERROR_403('用户不存在');
+            ctx.body = stsCode.S_902('用户不存在');
         }
 
     }
     /**
-     * 用户注册控制器
+     * 用户注册
      * @static
      * @param {*} ctx
      * @memberof UserController
      */
     static async UserRegister(ctx) {
         let data = ctx.request.body;
-        let user = await userModel.login(data.user_name);
+        let user = await userModel.UserExist(data.user_name);
         if (user) { //判断用户是否存在
-            // ctx.response.status = 401;
-            ctx.body = stsCode.ERROR_403('用户存在!');
+            ctx.body = stsCode.S_901('用户存在!');
         } else {
-            let userData = await userModel.register(data);
-            if (userData.flag) {
+            let id = Snowflake.GetOneId();
+            data.password = crypt.encryption(data.password);
+            let userData = await userModel.register(data,id);
+
+            if (userData.flag) { //添加成功
                 userData = userData.data
-                ctx.body = stsCode.SUCCESS_200('注册成功', {
+                ctx.body = stsCode.S_900( {
                     id: userData.id,
                     username: userData.user_name,
                 })
             } else {
-                ctx.body = stsCode.ERROR_403('用户存在!');
+                ctx.body = stsCode.S_902('用户添加失败!');
             }
         }
     }

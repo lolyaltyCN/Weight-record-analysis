@@ -1,7 +1,6 @@
 const router = require('koa-router')();
 const ShowController = require('../../app/controllers/showC');
 
-// router.get('/',ShowController.showRecordInfo);
 router.get('/', async (ctx, next) => {
     await ctx.render('./comp/show.art')
 })

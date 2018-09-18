@@ -5,7 +5,7 @@
 {{/block}}
 
 {{block 'linkcss'}}
-<link rel="stylesheet" href="./lib/layui/css/layui.css">
+<link rel="stylesheet" href="/lib/layui/css/layui.css">
 {{/block}}
 
 {{block 'body'}}

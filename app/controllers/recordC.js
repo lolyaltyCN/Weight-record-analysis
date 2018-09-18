@@ -18,8 +18,7 @@ class RecordController {
 
         if (data) {
             let odata = await recordModel.addRecordInfo(data);
-            ctx.response.status = 200;
-            ctx.body = odata ? stsCode.SUCCESS_200('创建用户成功', 'odata') : stsCode.ERROR_404('添加失败！')
+            ctx.body = odata ? stsCode.S_900(odata) : stsCode.S_903('添加失败！')
         } else {
             ctx.response.status = 412;
             ctx.body = '获取失败';
@@ -40,7 +39,7 @@ class RecordController {
         if (!isNaN(ctx.params.uid)) {
             let odata = await recordModel.selectMonthRecordInfo(data);
             ctx.response.status = 200;
-            ctx.body = odata === false ? stsCode.ERROR_404('暂无数据！') : stsCode.SUCCESS_200('success', odata) 
+            ctx.body = odata === false ? stsCode.S_902('暂无数据！') : stsCode.S_900(odata) 
         } else {
             ctx.response.status = 412;
             ctx.body = '获取失败';

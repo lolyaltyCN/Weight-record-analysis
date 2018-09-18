@@ -3,8 +3,7 @@
 {{block 'title'}} {{title}} {{/block}}
 
 {{block 'linkcss'}}
-<link rel="stylesheet" href="./lib/layui/css/layui.css">
-<link rel="stylesheet" href="./css/login.css">
+<link rel="stylesheet" href="/css/login.css">
 {{/block}}
 {{block 'body'}}
 <!-- login form -->
@@ -53,7 +52,7 @@
                 })
                 .then(function (response) {
                     var loaginRes = response.data;
-                    if (loaginRes.code == 200) {
+                    if (loaginRes.code == 900) {
                         layer.msg('登录成功！', {
                             icon: 1,
                             time: 1000
@@ -61,7 +60,7 @@
                             sessionStorage.setItem('userinfo',JSON.stringify(loaginRes.data))
                             window.location.href = './addrecord';
                         })
-                    } else if(loaginRes.code == 412){
+                    } else if(loaginRes.code == 903){
                         layer.msg('用户名或密码错误!', {
                             icon: 2,
                             time: 1000

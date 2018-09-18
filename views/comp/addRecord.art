@@ -3,8 +3,7 @@
 {{block 'title'}} {{title}} {{/block}}
 
 {{block 'linkcss'}}
-<link rel="stylesheet" href="./lib/layui/css/layui.css">
-<link rel="stylesheet" href="./css/addRecord.css">
+<link rel="stylesheet" href="/css/addRecord.css">
 {{/block}}
 {{block 'body'}}
 <!-- addRecord form -->
@@ -89,7 +88,7 @@
                     })
                     .then(function (response) {
                         var loaginRes = response.data;
-                        if (loaginRes.code == 200) {
+                        if (loaginRes.code == 900) {
                             layer.msg('添加成功！', {
                                 icon: 1,
                                 time: 1000

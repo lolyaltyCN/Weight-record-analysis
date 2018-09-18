@@ -29,7 +29,6 @@ router.use('/show',show.routes(),show.allowedMethods());
 /* 
 ** 首页
 */
-
 router.get('/', async (ctx, next) => {
 //   ctx.redirect('/login')
   ctx.render('index.art')
