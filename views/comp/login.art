@@ -57,7 +57,8 @@
                             icon: 1,
                             time: 1000
                         }, function () {
-                            sessionStorage.setItem('userinfo',JSON.stringify(loaginRes.data))
+                            until.setCookie(loaginRes.data)
+                            // sessionStorage.setItem('userinfo',JSON.stringify(loaginRes.data))
                             window.location.href = './addrecord';
                         })
                     } else if(loaginRes.code == 903){

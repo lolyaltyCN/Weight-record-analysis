@@ -11,6 +11,6 @@ const RecordController = require('../../app/controllers/recordC');
 //添加体重记录
 router.post('/record/add', RecordController.addUserRecordInfo);
 //根据月份查询记录信息
-router.get('/record/mon/:uid/:mon', RecordController.selectMonthRecordInfo);
+router.get('/record/mon/:mon', RecordController.selectMonthRecordInfo);
 
 module.exports = router

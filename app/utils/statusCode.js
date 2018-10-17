@@ -54,5 +54,17 @@
             msg
         }
     }
+    /**
+     * token失效或被篡改   909
+     * @returns
+     * @memberof statusCode
+     */
+    S_909(){
+        return {
+            code: 909,
+            msg:'身份信息失效或已被篡改'
+        }
+    }
 }
+
 module.exports = new statusCode();

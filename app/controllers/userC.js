@@ -2,7 +2,7 @@ const userModel = require('../service/userService');
 const stsCode = require('../utils/statusCode');
 const Snowflake = require('../utils/snowflake');
 const crypt = require('../utils/decrypt');
-const jwt = require('jsonwebtoken');
+const Token = require('../utils/token');
 
 class UserController {
     /**
@@ -50,12 +50,16 @@ class UserController {
     static async UserLogin(ctx) {
         let data = ctx.request.body;
         let user = await userModel.UserExist(data.user_name);
-        if (user) {
-            if (crypt.decrypt(data.password,user.password)) {
-                ctx.body = stsCode.S_900({
-                    id: user.id,
-                    username: user.user_name,
-                })
+
+        //查询用户是否存在
+        if (user) { 
+            //密码是否相同
+            if (crypt.decrypt(data.password,user.password)) { 
+
+                 // 签发token
+                let TOKEN = Token.issue(user)
+
+                ctx.body = stsCode.S_900(TOKEN)
             } else {
                 ctx.body = stsCode.S_903('用户名或密码错误');
             }
@@ -78,18 +82,12 @@ class UserController {
             ctx.body = stsCode.S_901('用户存在!');
         } else {
             let id = Snowflake.GetOneId();
+            //密码加密
             data.password = crypt.encryption(data.password);
+            //创建
             let userData = await userModel.register(data,id);
-
-            if (userData.flag) { //添加成功
-                userData = userData.data
-                ctx.body = stsCode.S_900( {
-                    id: userData.id,
-                    username: userData.user_name,
-                })
-            } else {
-                ctx.body = stsCode.S_902('用户添加失败!');
-            }
+            //添加成功
+            ctx.body = userData.flag ? stsCode.S_900('注册成功') : stsCode.S_902('用户添加失败!');
         }
     }
 

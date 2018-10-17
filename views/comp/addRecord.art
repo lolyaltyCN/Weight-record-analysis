@@ -62,10 +62,11 @@
         var $ = layui.$
         form.on('submit(post)', function (data) {
             var loginData = data.field;
-            var USERINFO = JSON.parse(sessionStorage.getItem('userinfo'));
+            // var USERINFO = JSON.parse(sessionStorage.getItem('userinfo'));
+            var TOKEN = until.getCookie('userToken');
             loginData.begin  = loginData.begin.replace(/\s/g,"") != "" ? loginData.begin.replace(/\s/g,"") : null
             loginData.end    = loginData.end.replace(/\s/g,"")   != "" ? loginData.end.replace(/\s/g,"") : null
-            if (!USERINFO) {
+            if (!TOKEN) {
                 layer.msg('请重新登录', {
                     icon: 3,
                     time: 1500
@@ -73,39 +74,45 @@
                     window.location.href = './login'
                 })
             } else {
-                
-            if(loginData.begin == null && loginData.end == null){
-                layer.msg('至少提交一个数据', {
-                    icon: 3,
-                    time: 1500
-                })
-            }else{
-                
-                axios.post('/api/record/add', {
-                        begin: loginData.begin,
-                        end: loginData.end,
-                        uid: USERINFO.id
+                if(loginData.begin == null && loginData.end == null){
+                    layer.msg('至少提交一个数据', {
+                        icon: 3,
+                        time: 1500
                     })
-                    .then(function (response) {
-                        var loaginRes = response.data;
-                        if (loaginRes.code == 900) {
-                            layer.msg('添加成功！', {
-                                icon: 1,
-                                time: 1000
-                            })
-                        } else {
-                            layer.msg('添加失败!', {
+                }else{
+                    axios.post('/api/record/add', {
+                            begin: loginData.begin,
+                            end: loginData.end
+                        },{
+                            headers: {'Authorization': TOKEN},
+                        })
+                        .then(function (response) {
+                            var loaginRes = response.data;
+                            if (loaginRes.code == 900) {
+                                layer.msg('添加成功！', {
+                                    icon: 1,
+                                    time: 1000
+                                })
+                            }else if(loaginRes.code = 909){
+                                layer.msg('无效的身份请重新登录！', {
+                                    icon: 2,
+                                    time: 1500
+                                },function(){
+                                    window.location.href = '/login'
+                                })
+                            } else {
+                                layer.msg('添加失败!', {
+                                    icon: 3,
+                                    time: 1000
+                                })
+                            }
+                        })
+                        .catch(function (error) {
+                            layer.msg('服务器出错!', {
                                 icon: 3,
                                 time: 1000
                             })
-                        }
-                    })
-                    .catch(function (error) {
-                        layer.msg('服务器出错!', {
-                            icon: 3,
-                            time: 1000
                         })
-                    })
                 }
             }
             //阻止表单跳转。如果需要表单跳转，去掉这段即可。

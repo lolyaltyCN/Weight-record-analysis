@@ -35,7 +35,6 @@
     </div>
     <!-- 结果展示 -->
     <div class="resultbox">
-            <h2 class="nodata">您本月暂无数据!</h2>
     </div>
 </div>
 
@@ -44,7 +43,7 @@
 {{block 'javascript'}}
 <script src="/lib/echarts/echarts.common.min.js"></script>
 <script>
-var USERINFO = JSON.parse(sessionStorage.getItem('userinfo'));
+var TOKEN = until.getCookie('userToken');
 layui.use(['element','laydate','layer'], function(){
   var laydate = layui.laydate;
   var $ = layui.$
@@ -56,26 +55,34 @@ layui.use(['element','laydate','layer'], function(){
         $('.resultbox .upload').show();
         var seleDate = value.split('-').join('');
         console.log(seleDate);
-        if (!USERINFO) {
+        if (!TOKEN) {
             layer.msg('请重新登录', {
                 icon: 3,
                 time: 1500
             }, function () {
-                window.location.href = './login'
+                window.location.href = '/login'
             })
         } else {
-            var UID = USERINFO.id;
             var MON = seleDate;
-            var URL = `/api/record/mon/${UID}/${MON}`;
+            var URL = `/api/record/mon/${MON}`;
             console.log(URL);
-            axios.get(URL).then((res)=>{
-                var Rdata = res.data.data
-                if(Rdata.length == 0){
-                    $('.resultbox .nodata').show();
-                }else{//echarts数据渲染
-                    $('.resultbox .nodata').hide();
-                    draw(value,Rdata,$('.resultbox')[0])
+            axios.get(URL,{
+                headers: {'Authorization': TOKEN},
+            }).then((res)=>{
+                var Rdata = res.data;
+                if(Rdata.code == 900){
+                    draw(value,Rdata.data,$('.resultbox')[0])
+                }else if(Rdata.code == 902){
+                    $('.resultbox').innerHTML = "您本月暂无数据!";
+                }else{
+                    layer.msg('无效的身份请重新登录！', {
+                        icon: 2,
+                        time: 1500
+                    },function(){
+                        window.location.href = '/login'
+                    })
                 }
+                
             }).catch((err)=>{
                 console.log(err)
             })
@@ -96,8 +103,7 @@ function draw(mon,data,Dom){
     console.log(TIEMLIST)
     var option = {
         title:{
-            text:USERINFO.username+"的" ,
-            subtext:mon+'月体重记录表',
+            text:mon+'月体重记录表',
             textStyle: {color:"#009688",align: 'center'},
             left: 'center'
         },

@@ -13,6 +13,7 @@
     {{block 'body'}}{{/block}}
     <script src="/lib/layui/layui.js"></script>
     <script src="https://unpkg.com/axios@0.18.0/dist/axios.min.js"></script>
+    <script src="/js/until.js"></script>
     {{block 'javascript'}}{{/block}}
 </body>
 </html>

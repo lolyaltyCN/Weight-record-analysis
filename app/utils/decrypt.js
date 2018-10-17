@@ -1,7 +1,7 @@
 /*
  * @Author: Sinwer 
  * @Date: 2018-09-18 20:31:31 
- * @content:    加密密码
+ * @content:    加密解密
  */
 const bcrypt = require("bcrypt");
 

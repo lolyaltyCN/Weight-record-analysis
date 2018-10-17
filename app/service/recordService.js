@@ -9,6 +9,7 @@ const UserRecord = db.UserRecord;
 const moment = require('moment');
 const Snowflake = require('../utils/snowflake');
 
+
 class recordModel {
     /**
      * 根据月份查询用户体重信息
